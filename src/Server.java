@@ -103,6 +103,13 @@ public class Server {
         }
         catch (IOException e) {
             System.out.println(ServerMessages.MESSAGE_END);
+            try {
+                server.close();
+                inStream.close();
+                outStream.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 
