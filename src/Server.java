@@ -11,7 +11,7 @@ public class Server {
     private static DataOutputStream outStream;
     private static FileData myData;
     private static CRUD crud;
-    private int port,index;
+    private int index;
     private String fileName,request,listName;
 
     public Server(String fileName, String listName) {
@@ -41,7 +41,6 @@ public class Server {
     }
 
     public void setPort(int port){
-        this.port=port;
         try {
             server = new ServerSocket(port);
         } catch (IOException e) {
