@@ -11,36 +11,33 @@ public class Server {
     private static DataOutputStream outStream;
     private static FileData myData;
     private static CRUD crud;
-    private int index;
-    private String fileName,request,listName;
+    private int index,port;
+    private String fileName,request;
 
-    public Server(String fileName, String listName) {
+    public int loadFile(String fileName){
         this.fileName = fileName;
-        this.listName = listName;
-    }
-
-    public void loadFile(){
-        myData = new FileData(listName);
+        myData = new FileData();
         System.out.println(ServerMessages.MESSAGE_LOAD_FILE);
         try {
             myData.loadJSON(fileName);
-            System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
         }catch (Exception e){
-            System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_NO);
+            return -1;
         }
+        return 0;
     }
 
-    public void saveFile(){
+    public int saveFile(){
         System.out.println(ServerMessages.MESSAGE_SAVE_FILE);
         try {
             myData.saveJSON(crud.getJson(), fileName);
-            System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
         } catch (Exception e) {
-            System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_NO);
+            return -1;
         }
+        return 0;
     }
 
     public void setPort(int port){
+        this.port = port;
         try {
             server = new ServerSocket(port);
         } catch (IOException e) {
@@ -96,6 +93,7 @@ public class Server {
                         outStream.flush();
                     default:
                         outStream.writeUTF(ServerMessages.MESSAGE_ERROR);
+                        outStream.flush();
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_NO);
                 }
             }

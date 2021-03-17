@@ -10,11 +10,8 @@ public class FileData {
 
 
         private JSONObject json;
-        private String fileName, listName;
-
-        public FileData(String listName) {
-            this.listName = listName ;
-        }
+        private String fileName;
+        private final String listName = "userData";
 
         public String getListName() {
             return listName;
