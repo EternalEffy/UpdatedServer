@@ -1,3 +1,5 @@
+import org.json.JSONObject;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,6 +15,7 @@ public class Server {
     private static CRUD crud;
     private int index,port;
     private String fileName,request;
+    private Requests newRequest=new Requests();
 
     public int loadFile(String fileName){
         this.fileName = fileName;
@@ -59,18 +62,24 @@ public class Server {
             }
 
             while (!clientSocket.isClosed()) {
-                request = inStream.readUTF();
-                switch (request){
+                String requestFormClient = inStream.readUTF();
+                index = Integer.parseInt(inStream.readUTF());
+                JSONObject jsonObject = new JSONObject(requestFormClient);
+                System.out.println(jsonObject.toString());
+                newRequest.setRequest(jsonObject.getString("request"));
+                switch (newRequest.getRequest()){
                     case Requests.add:
                         System.out.println(ServerMessages.MESSAGE_ADD);
-                        crud.add(inStream.readUTF(), myData.getListName());
+                        crud.add((String) jsonObject.getJSONArray("userData").get(0),
+                                (String) jsonObject.getJSONArray("userData").get(1),
+                                (String) jsonObject.getJSONArray("userData").get(2),
+                                (String) jsonObject.getJSONArray("userData").get(3), myData.getListName());
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
-                        outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(Integer.parseInt(inStream.readUTF()), myData.getListName()));
+                        outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
                         outStream.flush();
                         break;
                     case Requests.get:
                         System.out.println(ServerMessages.MESSAGE_GET);
-                        index = Integer.parseInt(inStream.readUTF());
                         crud.get(index, myData.getListName());
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
                         outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
@@ -78,19 +87,21 @@ public class Server {
                         break;
                     case Requests.edit:
                         System.out.println(ServerMessages.MESSAGE_EDIT);
-                        index = Integer.parseInt(inStream.readUTF());
-                        crud.edit(index, myData.getListName(), inStream.readUTF());
+                        crud.edit(index, myData.getListName(),(String) jsonObject.getJSONArray("userData").get(0),
+                                (String) jsonObject.getJSONArray("userData").get(1),
+                                (String) jsonObject.getJSONArray("userData").get(2),
+                                (String) jsonObject.getJSONArray("userData").get(3) );
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
                         outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
                         outStream.flush();
                         break;
                     case Requests.remove:
                         System.out.println(ServerMessages.MESSAGE_REMOVE);
-                        index = Integer.parseInt(inStream.readUTF());
                         crud.remove(index, myData.getListName());
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
                         outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
                         outStream.flush();
+
                     default:
                         outStream.writeUTF(ServerMessages.MESSAGE_ERROR);
                         outStream.flush();

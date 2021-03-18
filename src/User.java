@@ -1,8 +1,8 @@
 public class User {
     private String username;
-    private int age, score, level;
+    private String age, score, level;
 
-    public User(String username,int age, int score, int level){
+    public User(String username,String age, String score, String level){
         this.username=username;
         this.age=age;
         this.score=score;
@@ -17,27 +17,27 @@ public class User {
         this.username = username;
     }
 
-    public int getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
-    public int getScore() {
+    public String getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(String score) {
         this.score = score;
     }
 
-    public int getLevel() {
+    public String getLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(String level) {
         this.level = level;
     }
     public String toString(){
