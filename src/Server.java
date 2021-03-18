@@ -1,5 +1,4 @@
 import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,8 +13,8 @@ public class Server {
     private static FileData myData;
     private static CRUD crud;
     private int index,port;
-    private String fileName,request;
-    private Requests newRequest=new Requests();
+    private String fileName;
+    private String requestFormClient;
 
     public int loadFile(String fileName){
         this.fileName = fileName;
@@ -53,27 +52,23 @@ public class Server {
         try {
             System.out.println("Сервер запущен");
             clientSocket = server.accept();
-            inStream= new DataInputStream(clientSocket.getInputStream());
-            outStream=new DataOutputStream((clientSocket.getOutputStream()));
             if (clientSocket.isConnected()) {
                 System.out.println(ServerMessages.MESSAGE_ACCESS + clientSocket.getInetAddress());
+                inStream= new DataInputStream(clientSocket.getInputStream());
+                outStream=new DataOutputStream((clientSocket.getOutputStream()));
                 outStream.writeUTF(inStream.readUTF()+ServerMessages.USER_MESSAGE_ACCESS);
                 outStream.flush();
             }
 
             while (!clientSocket.isClosed()) {
-                String requestFormClient = inStream.readUTF();
+                requestFormClient = inStream.readUTF();
                 index = Integer.parseInt(inStream.readUTF());
                 JSONObject jsonObject = new JSONObject(requestFormClient);
-                System.out.println(jsonObject.toString());
-                newRequest.setRequest(jsonObject.getString("request"));
-                switch (newRequest.getRequest()){
+
+                switch (jsonObject.getString("request")){
                     case Requests.add:
                         System.out.println(ServerMessages.MESSAGE_ADD);
-                        crud.add((String) jsonObject.getJSONArray("userData").get(0),
-                                (String) jsonObject.getJSONArray("userData").get(1),
-                                (String) jsonObject.getJSONArray("userData").get(2),
-                                (String) jsonObject.getJSONArray("userData").get(3), myData.getListName());
+                        crud.add(jsonObject.getJSONArray(myData.getListName()), myData.getListName());
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
                         outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
                         outStream.flush();
@@ -87,10 +82,7 @@ public class Server {
                         break;
                     case Requests.edit:
                         System.out.println(ServerMessages.MESSAGE_EDIT);
-                        crud.edit(index, myData.getListName(),(String) jsonObject.getJSONArray("userData").get(0),
-                                (String) jsonObject.getJSONArray("userData").get(1),
-                                (String) jsonObject.getJSONArray("userData").get(2),
-                                (String) jsonObject.getJSONArray("userData").get(3) );
+                        crud.edit(index, myData.getListName(), jsonObject.getJSONArray(myData.getListName()));
                         System.out.println(ServerMessages.MESSAGE_USER_INFO + ServerMessages.MESSAGE_RESULT_YES);
                         outStream.writeUTF(ServerMessages.MESSAGE_USER_INFO + crud.get(index, myData.getListName()));
                         outStream.flush();
